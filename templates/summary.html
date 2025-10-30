@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Summary</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background-color: #f0f2f5; margin: 0; padding: 2rem; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 2rem 3rem; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        h1 { color: #333; }
+        .summary-content { white-space: pre-wrap; /* This makes sure line breaks are respected */ background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; line-height: 1.6; }
+        a.back-link { display: inline-block; margin-top: 2rem; text-decoration: none; background-color: #6c757d; color: white; padding: 0.6rem 1.2rem; border-radius: 8px; transition: background-color 0.2s; }
+        a.back-link:hover { background-color: #5a6268; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Document Summary</h1>
+        <div class="summary-content">
+            {{ summary_text }}
+        </div>
+        <a href="/" class="back-link">Upload Another Document</a>
+    </div>
+</body>
+</html>

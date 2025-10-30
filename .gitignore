@@ -1,0 +1,12 @@
+# Secret files - DO NOT PUSH
+.env
+serviceAccountKey.json
+
+# Environment folder - DO NOT PUSH
+.venv/
+
+# Python cache
+__pycache__/
+
+# IDE folders
+.idea/

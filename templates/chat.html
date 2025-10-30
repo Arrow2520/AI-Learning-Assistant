@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat with PDF</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: system-ui, sans-serif; background-color: #f0f2f5; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: white; padding: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; }
+        .header h1 { margin: 0; color: #333; }
+        .chat-container { flex-grow: 1; max-width: 800px; width: 100%; margin: 1rem auto; background: white; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column; overflow: hidden; }
+        .chat-history { flex-grow: 1; padding: 1.5rem; overflow-y: auto; }
+        .message { margin-bottom: 1rem; padding: 0.75rem 1.25rem; border-radius: 18px; line-height: 1.5; max-width: 75%; }
+        .message.user { background-color: #007bff; color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+        .message.ai { background-color: #e9ecef; color: #333; margin-right: auto; border-bottom-left-radius: 4px; }
+        .chat-input { border-top: 1px solid #ddd; padding: 1rem; background: #f8f9fa; }
+        .chat-input form { display: flex; }
+        .chat-input input { flex-grow: 1; border: 1px solid #ccc; border-radius: 18px; padding: 0.75rem 1rem; font-size: 1rem; }
+        .chat-input button { background-color: #007bff; color: white; border: none; border-radius: 50%; width: 44px; height: 44px; margin-left: 0.5rem; cursor: pointer; font-size: 1.2rem; }
+        .message.loading { background-color: #e9ecef; color: #888; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Chat with your Document</h1>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-history" id="chat-history">
+            <div class="message ai">Hi! Ask me anything about your document.</div>
+        </div>
+        <div class="chat-input">
+            <form id="chat-form">
+                <input type="text" id="question-input" placeholder="Type your question..." required>
+                <button type="submit">➤</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const chatForm = document.getElementById('chat-form');
+        const questionInput = document.getElementById('question-input');
+        const chatHistory = document.getElementById('chat-history');
+
+        // Get the document ID from the page's URL
+        const docId = window.location.pathname.split('/').pop();
+
+        // Helper function to add a message to the chat
+        function addMessageToChat(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = text;
+            chatHistory.appendChild(messageDiv);
+            // Scroll to the bottom
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            return messageDiv; // Return the div so we can update it
+        }
+
+        // Handle form submission
+        chatForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            // 1. Add user's message to chat
+            addMessageToChat('user', question);
+            questionInput.value = '';
+
+            // 2. Add a loading message for the AI
+            const loadingMessage = addMessageToChat('ai loading', '...');
+
+            try {
+                // 3. Send the question to the backend API
+                const response = await fetch(`/ask_question/${docId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question })
+                });
+
+                const result = await response.json();
+
+                // 4. Update the loading message with the real answer
+                if (response.ok) {
+                    loadingMessage.textContent = result.answer;
+                } else {
+                    loadingMessage.textContent = `Error: ${result.answer}`;
+                }
+                loadingMessage.classList.remove('loading');
+
+            } catch (error) {
+                loadingMessage.textContent = 'A network error occurred. Please try again.';
+                loadingMessage.classList.remove('loading');
+            }
+        });
+    </script>
+</body>
+</html>

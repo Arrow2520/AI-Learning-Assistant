@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Learning Assistant</title>
+    <style>
+        /* Styles are the same as before, no changes needed here */
+        body { font-family: system-ui, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f2f5; margin: 0; }
+        .container { background: white; padding: 2rem 3rem; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); text-align: center; max-width: 600px; width: 100%;}
+        .hidden { display: none; }
+        /* Style the link to look like a button */
+        a.button { display: inline-block; text-decoration: none; background-color: #007bff; color: white; padding: 0.7rem 1.5rem; border-radius: 8px; font-size: 1rem; margin: 0.5rem; transition: background-color 0.2s;}
+        a.button:hover { background-color: #0056b3; }
+        .loading { color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="upload-section">
+            <h1>Upload Your PDF</h1>
+            <form id="upload-form">
+                <input type="file" id="pdf-file-input" accept=".pdf" required>
+                <br><br>
+                <button type="submit">Upload PDF</button>
+            </form>
+            <p id="upload-message" class="loading"></p>
+        </div>
+
+        <div id="actions-section" class="hidden">
+            <h2>Upload Successful!</h2>
+            <p>What would you like to do?</p>
+            <a id="summarize-link" class="button">Get Summary</a>
+            <a id="flashcards-link" class="button">Create Flashcards</a>
+            <a id="chat-link" class="button">Chat with PDF</a>
+        </div>
+    </div>
+
+    <script>
+        const uploadSection = document.getElementById('upload-section');
+        const actionsSection = document.getElementById('actions-section');
+        const uploadForm = document.getElementById('upload-form');
+        const fileInput = document.getElementById('pdf-file-input');
+        const uploadMessage = document.getElementById('upload-message');
+        const summarizeLink = document.getElementById('summarize-link');
+        const flashcardsLink = document.getElementById('flashcards-link');
+        // **** THIS LINE IS NEW ****
+        const chatLink = document.getElementById('chat-link');
+
+        uploadForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData();
+            formData.append('pdf_file', fileInput.files[0]);
+
+            uploadMessage.textContent = 'Uploading...';
+
+            try {
+                const response = await fetch('/upload_pdf', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (response.ok) {
+                    const docId = result.document_id;
+                    // Set the link's destination URL dynamically
+                    summarizeLink.href = `/summarize/${docId}`;
+                    flashcardsLink.href = `/generate_flashcards/${docId}`;
+                    // **** THIS LINE IS NEW ****
+                    chatLink.href = `/chat/${docId}`;
+
+                    // Switch the visible sections
+                    uploadSection.classList.add('hidden');
+                    actionsSection.classList.remove('hidden');
+                } else {
+                    uploadMessage.textContent = `Error: ${result.message}`;
+                }
+            } catch (error) {
+                uploadMessage.textContent = `Network error: ${error}`;
+            }
+        });
+    </script>
+</body>
+</html>

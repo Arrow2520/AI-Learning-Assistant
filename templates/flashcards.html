@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generated Flashcards</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background-color: #f0f2f5; margin: 0; padding: 2rem; }
+        .container { max-width: 800px; margin: auto; }
+        h1 { text-align: center; color: #333; margin-bottom: 2rem; }
+        .flashcard { background: white; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.07); margin-bottom: 1.5rem; padding: 1.5rem 2rem; }
+        .flashcard .question { font-weight: 600; color: #007bff; margin-bottom: 1rem; font-size: 1.2rem; }
+        .flashcard .answer { color: #555; line-height: 1.6; }
+        a.back-link { display: block; text-align: center; margin-top: 2rem; text-decoration: none; background-color: #6c757d; color: white; padding: 0.6rem 1.2rem; border-radius: 8px; transition: background-color 0.2s; width: fit-content; margin-left: auto; margin-right: auto;}
+        a.back-link:hover { background-color: #5a6268; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Flashcards</h1>
+
+        <!-- Flask will loop through each flashcard and create a div for it -->
+        {% for card in flashcards %}
+            <div class="flashcard">
+                <div class="question">Q: {{ card.question }}</div>
+                <div class="answer">A: {{ card.answer }}</div>
+            </div>
+        {% else %}
+            <!-- This message shows if the flashcards list is empty -->
+            <div class="flashcard">
+                <div class="answer">No flashcards were generated.</div>
+            </div>
+        {% endfor %}
+
+        <a href="/" class="back-link">Upload Another Document</a>
+    </div>
+</body>
+</html>
