@@ -269,7 +269,7 @@ def summarize_pdf(doc_id):
     try:
         response = model.generate_content(prompt)
         summary_html = markdown2.markdown(response.text)
-        return render_template('summary.html', summary_text=summary_html)
+        return render_template('summary.html', summary_html=summary_html)
     except Exception as e:
         error_message = f"An error occurred with the AI model: {e}"
         return render_template('summary.html', summary_text=error_message)
