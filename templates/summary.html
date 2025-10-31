@@ -16,7 +16,7 @@
     <div class="container">
         <h1>Document Summary</h1>
         <div class="summary-content">
-            {{ summary_text }}
+            {{ summary_html | safe}}
         </div>
         <a href="/" class="back-link">Upload Another Document</a>
     </div>

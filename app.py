@@ -15,8 +15,7 @@ from vertexai.language_models import TextEmbeddingModel
 from google.cloud.firestore_v1.vector import Vector
 import time
 from google.cloud.firestore_v1.base_vector_query import DistanceMeasure
-
-# ---------------------
+import markdown2
 
 # Load environment variables from .env file
 load_dotenv()
@@ -54,7 +53,7 @@ except Exception as e:
     model = None
 # -----------------------------
 
-# --- NEW: Initialize the Embedding Model ---
+# --- Initialize the Embedding Model ---
 try:
     # Use the official Google model for text embeddings
     embedding_model = TextEmbeddingModel.from_pretrained("text-embedding-004")
@@ -106,7 +105,7 @@ def extract_text_from_pdf(document_id):
         return None
 
 
-# --- NEW: Function to create and store embeddings ---
+# --- Function to create and store embeddings ---
 def create_and_store_embeddings(document_id, text_content):
     """
     Chunks text, creates embeddings, and stores them in Firestore.
@@ -269,7 +268,8 @@ def summarize_pdf(doc_id):
 
     try:
         response = model.generate_content(prompt)
-        return render_template('summary.html', summary_text=response.text)
+        summary_html = markdown2.markdown(response.text)
+        return render_template('summary.html', summary_text=summary_html)
     except Exception as e:
         error_message = f"An error occurred with the AI model: {e}"
         return render_template('summary.html', summary_text=error_message)
@@ -304,6 +304,15 @@ def generate_flashcards(doc_id):
         cleaned_response = response.text.strip().replace("```json", "").replace("```", "")
         import json
         flashcards_data = json.loads(cleaned_response)
+
+        # Convert question and answer fields from Markdown to HTML
+        for card in flashcards_data:
+            if 'question' in card:
+                card['question'] = markdown2.markdown(card['question'])
+            if 'answer' in card:
+                card['answer'] = markdown2.markdown(card['answer'])
+        # ----------------
+
         return render_template('flashcards.html', flashcards=flashcards_data)
     except Exception as e:
         print(f"Error generating or parsing flashcards: {e}")
@@ -361,10 +370,11 @@ def ask_question(doc_id):
 
         # 5. Generate the answer from Gemini
         response = model.generate_content(prompt)
+        answer_html = markdown2.markdown(response.text)
 
         return jsonify({
             "status": "success",
-            "answer": response.text
+            "answer": answer_html
         })
 
     except Exception as e:

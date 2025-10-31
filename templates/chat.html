@@ -50,7 +50,7 @@
         function addMessageToChat(sender, text) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-            messageDiv.textContent = text;
+            messageDiv.innerHTML = text;
             chatHistory.appendChild(messageDiv);
             // Scroll to the bottom
             chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -82,14 +82,14 @@
 
                 // 4. Update the loading message with the real answer
                 if (response.ok) {
-                    loadingMessage.textContent = result.answer;
+                    loadingMessage.innerHTML = result.answer;
                 } else {
-                    loadingMessage.textContent = `Error: ${result.answer}`;
+                    loadingMessage.innerHTML = `Error: ${result.answer}`;
                 }
                 loadingMessage.classList.remove('loading');
 
             } catch (error) {
-                loadingMessage.textContent = 'A network error occurred. Please try again.';
+                loadingMessage.innerHTML = 'A network error occurred. Please try again.';
                 loadingMessage.classList.remove('loading');
             }
         });

@@ -21,8 +21,8 @@
         <!-- Flask will loop through each flashcard and create a div for it -->
         {% for card in flashcards %}
             <div class="flashcard">
-                <div class="question">Q: {{ card.question }}</div>
-                <div class="answer">A: {{ card.answer }}</div>
+                <div class="question">Q: {{ card.question | safe }}</div>
+                <div class="answer">A: {{ card.answer | safe }}</div>
             </div>
         {% else %}
             <!-- This message shows if the flashcards list is empty -->
