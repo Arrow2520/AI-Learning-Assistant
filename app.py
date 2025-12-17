@@ -32,9 +32,9 @@ try:
     })
     db = firestore.client()
     bucket = storage.bucket()
-    print("✅ Firebase connection successful!")
+    print("Firebase connection successful!")
 except Exception as e:
-    print(f"🔥 Firebase connection failed: {e}")
+    print(f"Firebase connection failed: {e}")
     db = None
     bucket = None
 # -----------------------------
@@ -47,9 +47,9 @@ try:
 
     # Model for text generation (summaries, flashcards, chat)
     model = GenerativeModel("gemini-2.5-pro")
-    print("✅ Vertex AI (Gemini) initialized successfully!")
+    print("Vertex AI (Gemini) initialized successfully!")
 except Exception as e:
-    print(f"🔥 Vertex AI initialization failed: {e}")
+    print(f"Vertex AI initialization failed: {e}")
     model = None
 # -----------------------------
 
@@ -57,9 +57,9 @@ except Exception as e:
 try:
     # Use the official Google model for text embeddings
     embedding_model = TextEmbeddingModel.from_pretrained("text-embedding-004")
-    print("✅ Text Embedding model initialized successfully!")
+    print("Text Embedding model initialized successfully!")
 except Exception as e:
-    print(f"🔥 Text Embedding model initialization failed: {e}")
+    print(f"Text Embedding model initialization failed: {e}")
     embedding_model = None
 
 
