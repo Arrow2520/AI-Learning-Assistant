@@ -159,10 +159,10 @@ correct path: from google.cloud.firestore_v1.vector import Vector.
 ● Solution 3: After research, we discovered that this feature must be created via the
 command line. We installed the gcloud CLI and successfully built the index with the
 command:
-gcloud firestore indexes composite create \
+`gcloud firestore indexes composite create \
 --collection-group=embeddings \
 --query-scope=COLLECTION \
---field-config=field-path=embedding,vector-config='{"dimension":768,"flat":"{}"}'
+--field-config=field-path=embedding,vector-config='{"dimension":768,"flat":"{}"}'`
 
 
 ## 6. Phase 5: Deployment to Render
