@@ -25,7 +25,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # --------------------------------------------------
 # DB
 # --------------------------------------------------
-conn = psycopg2.connect(SUPABASE_DB_URL)
+conn = psycopg2.connect(SUPABASE_DB_URL, sslmode="require")
 conn.autocommit = True
 
 # --------------------------------------------------
