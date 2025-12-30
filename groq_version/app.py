@@ -131,19 +131,55 @@ def upload_pdf():
 @app.route("/summarize/<doc_id>")
 def summarize(doc_id):
     cur = conn.cursor()
+
+    # Check cache first
     cur.execute(
-        "SELECT content FROM embeddings WHERE document_id=%s LIMIT 10",
+        "SELECT summary_text FROM summaries WHERE document_id=%s",
         (doc_id,)
     )
-    text = " ".join(row[0] for row in cur.fetchall())
+    row = cur.fetchone()
 
-    prompt = f"Summarize the following content clearly:\n{text}"
-    summary = groq_generate(prompt)
+    if row:
+        final_summary = row[0]   # 🎯 cached summary
+        return render_template(
+            "summary.html",
+            summary_html=markdown2.markdown(final_summary)
+        )
+
+    # Otherwise: build chunks from DB
+    cur.execute(
+        "SELECT content FROM embeddings WHERE document_id=%s",
+        (doc_id,)
+    )
+    chunks = [r[0] for r in cur.fetchall()]
+
+    partial_summaries = []
+
+    for chunk in chunks:
+        summary = groq_generate(
+            f"Summarize clearly and concisely:\n\n{chunk}"
+        )
+        partial_summaries.append(summary)
+
+    combined_text = "\n\n".join(partial_summaries)
+
+    final_summary = groq_generate(
+        "Combine these summaries into one coherent final summary. "
+        "Keep it structured, accurate, and easy to read:\n\n"
+        + combined_text
+    )
+
+    # Save to cache
+    cur.execute(
+        "INSERT INTO summaries (document_id, summary_text) VALUES (%s, %s)",
+        (doc_id, final_summary)
+    )
 
     return render_template(
         "summary.html",
-        summary_html=markdown2.markdown(summary)
+        summary_html=markdown2.markdown(final_summary)
     )
+
 
 @app.route("/generate_flashcards/<doc_id>")
 def generate_flashcards(doc_id):
@@ -159,20 +195,20 @@ def generate_flashcards(doc_id):
             raise RuntimeError("No content available to generate flashcards.")
 
         prompt = f"""
-You are an AI that ONLY outputs valid JSON.
-DO NOT include explanations, markdown, or extra text.
+                    You are an AI that ONLY outputs valid JSON.
+                    DO NOT include explanations, markdown, or extra text.
 
-Task:
-Generate 8 flashcards from the text below.
+                    Task:
+                    Generate 8 flashcards from the text below.
 
-Output format (STRICT):
-[
-  {{"question": "Q1", "answer": "A1"}},
-  {{"question": "Q2", "answer": "A2"}}
-]
+                    Output format (STRICT):
+                    [
+                        {{"question": "Q1", "answer": "A1"}},
+                        {{"question": "Q2", "answer": "A2"}}
+                    ]
 
-Text:
-{text}
+                    Text:
+                    {text}
 """
 
         response = groq_generate(prompt).strip()

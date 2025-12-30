@@ -19,6 +19,9 @@
             {{ summary_html | safe}}
         </div>
         <a href="/" class="back-link">Upload Another Document</a>
+        <a href="/?doc={{ request.path.split('/')[-1] }}" class="back-link">
+            Go Back To Options
+        </a>
     </div>
 </body>
 </html>
