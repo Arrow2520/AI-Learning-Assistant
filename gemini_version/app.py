@@ -207,7 +207,6 @@ def upload_pdf():
                 'status': 'uploaded'  # Set initial status
             })
 
-            # --- THIS IS THE NEW PART ---
             # 7. Start the embedding process
             print(f"Starting embedding process for {doc_id}...")
             text_content = extract_text_from_pdf(doc_id)
@@ -381,6 +380,5 @@ def ask_question(doc_id):
         print(f"An error occurred in /ask_question: {e}")
         return jsonify({"status": "error", "answer": f"An error occurred: {e}"}), 500
 
-# This allows the file to be run directly
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
