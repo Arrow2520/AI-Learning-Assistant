@@ -1,10 +1,10 @@
-# Project Documentation: AI Learning Assistant (v2.0)
+# Project Documentation: DocMind (v2.0)
 
 ## 1. Project Overview
 
 ### Goal
 
-Version 2 of the AI Learning Assistant was built to **re-engineer the original system**
+Version 2 of the DocMind was built to **re-engineer the original system**
 with a focus on:
 
 - Cost efficiency

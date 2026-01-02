@@ -1,4 +1,4 @@
-# Project Documentation: AI Learning Assistant (v1.0)
+# Project Documentation: DocMind (v1.0)
 
 ## 1. Project Overview
 

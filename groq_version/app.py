@@ -132,7 +132,7 @@ def upload_pdf():
 def summarize(doc_id):
     cur = conn.cursor()
 
-    # Check cache first
+    # ---- Check cache ----
     cur.execute(
         "SELECT summary_text FROM summaries WHERE document_id=%s",
         (doc_id,)
@@ -140,38 +140,40 @@ def summarize(doc_id):
     row = cur.fetchone()
 
     if row:
-        final_summary = row[0]   # 🎯 cached summary
+        final_summary = row[0]
         return render_template(
             "summary.html",
             summary_html=markdown2.markdown(final_summary)
         )
 
-    # Otherwise: build chunks from DB
+    # ---- Pull ALL text from DB ----
     cur.execute(
         "SELECT content FROM embeddings WHERE document_id=%s",
         (doc_id,)
     )
-    chunks = [r[0] for r in cur.fetchall()]
+    all_text = " ".join(r[0] for r in cur.fetchall())
 
-    partial_summaries = []
-
-    for chunk in chunks:
-        summary = groq_generate(
-            f"Summarize clearly and concisely:\n\n{chunk}"
+    if not all_text.strip():
+        return render_template(
+            "summary.html",
+            summary_html=markdown2.markdown("No content available to summarize.")
         )
-        partial_summaries.append(summary)
 
-    combined_text = "\n\n".join(partial_summaries)
+    # ---- LLM summary call ----
+    prompt = f"""
+    Summarize the following document clearly and accurately.
+    Use headings and bullet points when helpful.
+    Avoid adding information that is not present.
 
-    final_summary = groq_generate(
-        "Combine these summaries into one coherent final summary. "
-        "Keep it structured, accurate, and easy to read:\n\n"
-        + combined_text
-    )
+    Document:
+    {all_text}
+    """
 
-    # Save to cache
+    final_summary = groq_generate(prompt)
+
+    # ---- Cache summary ----
     cur.execute(
-        "INSERT INTO summaries (document_id, summary_text) VALUES (%s, %s)",
+        "INSERT INTO summaries (document_id, summary_text) VALUES (%s,%s)",
         (doc_id, final_summary)
     )
 
@@ -179,6 +181,7 @@ def summarize(doc_id):
         "summary.html",
         summary_html=markdown2.markdown(final_summary)
     )
+
 
 
 @app.route("/generate_flashcards/<doc_id>")

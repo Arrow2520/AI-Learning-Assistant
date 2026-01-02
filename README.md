@@ -1,4 +1,4 @@
-# AI Learning Assistant
+# DocMind
 
 This repository contains an **AI-powered learning assistant** that allows users to upload PDF documents and interact with them using modern AI techniques such as **semantic search, chat, summaries, and flashcards**.
 
